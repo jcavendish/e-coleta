@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, ChangeEvent } from 'react';
+import React, { useState, useEffect, useCallback, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
@@ -25,8 +25,13 @@ interface IBGECityResponse {
   nome: string;
 }
 
+interface PointData {
+  name: string;
+}
+
 const CreatePoint = () => {
   const [items, setItems] = useState<ItemData[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const [ufs, setUfs] = useState<string[]>([]);
   const [selectedUf, setSelectedUf] = useState('0');
@@ -36,6 +41,12 @@ const CreatePoint = () => {
 
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
   const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    whatsapp: ''
+  })
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(position => {
@@ -95,6 +106,49 @@ const CreatePoint = () => {
     ])
   }, [])
 
+  const handleChangeData = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    })
+  }, [formData])
+
+  const handleSelectItem = useCallback((id: number) => {
+    setSelectedItems(items => {
+      if (items.includes(id)) {
+        return items.filter(item => item !== id);
+      }
+      return [...items, id];
+    });
+  }, [])
+
+  const handleSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const { name, email, whatsapp } = formData;
+    const uf = selectedUf;
+    const city = selectedCity;
+    const [latitude, longitude] = selectedPosition;
+    const items = selectedItems;
+
+    const data = {
+      name,
+      email,
+      whatsapp,
+      uf,
+      city,
+      latitude,
+      longitude,
+      items
+    }
+
+    const response = await api.post<PointData>('points', data);
+
+    console.log(response.data.name);
+
+  }, [formData, selectedCity, selectedItems, selectedPosition, selectedUf])
+
   return (
     <div id="page-create-point">
       <header>
@@ -106,7 +160,7 @@ const CreatePoint = () => {
         </Link>
       </header>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <h1>Cadastro do <br /> ponto de coleta</h1>
 
         <fieldset>
@@ -120,6 +174,7 @@ const CreatePoint = () => {
               type="text"
               name="name"
               id="name"
+              onChange={handleChangeData}
             />
           </div>
 
@@ -130,6 +185,7 @@ const CreatePoint = () => {
                 type="email"
                 name="email"
                 id="email"
+                onChange={handleChangeData}
               />
             </div>
             <div className="field">
@@ -138,6 +194,7 @@ const CreatePoint = () => {
                 type="text"
                 name="whatsapp"
                 id="whatsapp"
+                onChange={handleChangeData}
               />
             </div>
           </div>
@@ -197,7 +254,11 @@ const CreatePoint = () => {
 
           <ul className="items-grid">
             {items.map(item => (
-              <li key={item.id}>
+              <li
+                key={item.id}
+                onClick={() => handleSelectItem(item.id)}
+                className={selectedItems.includes(item.id) ? 'selected' : ''}
+              >
               <img src={item.image_url} alt={item.title}/>
               <span>{item.title}</span>
             </li>

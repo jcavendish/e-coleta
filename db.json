@@ -1,4 +1,21 @@
 {
+  "points": [
+    {
+      "name": "Mercado do Ze",
+      "email": "ze@ze.com",
+      "whatsapp": "918889391",
+      "uf": "PE",
+      "city": "Ipojuca",
+      "latitude": -8.430347451200289,
+      "longitude": -34.981756210327156,
+      "items": [
+        6,
+        3,
+        5
+      ],
+      "id": 1
+    }
+  ],
   "items": [
     {
       "id": 1,
