@@ -18,16 +18,18 @@ export const ToastProvider: React.FC = ({ children }) => {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
 
   const addToast = useCallback((message: Omit<ToastMessage, 'id'>) => {
-    const toast = {
-      id: uuid(),
-      message: message.message
-    }
-    setMessages([...messages, toast]);
-  }, [messages])
+    setMessages(state => {
+      const toast = {
+        id: uuid(),
+        message: message.message
+      }
+      return [...state, toast];
+    });
+  }, [])
 
   const removeToast = useCallback((id: string) => {
-    setMessages(messages.filter(toast => toast.id !== id));
-  }, [messages])
+    setMessages(state => state.filter(toast => toast.id !== id));
+  }, [])
 
   return (
     <ToastContext.Provider value={{addToast, removeToast}}>

@@ -17,21 +17,21 @@ const ToastContainer: React.FC<ToastContainerProps> = ({ toastMessages }) => {
 
   const animatedToasts = useTransition(toastMessages, toast => toast.id,
     {
-      from: { top: '0px', opacity: 0.5 },
-      enter: { bottom: '0px', opacity: 1 },
-      leave: { top: '0px', opacity: 0.5 },
+      from: { left: '-100%', opacity: 0.5 },
+      enter: { left: '0%', opacity: 1 },
+      leave: { left: '100%', opacity: 0.5 },
     }
   )
 
   return (
     <div className="toast-container">
-      {animatedToasts.map(({item, key, props}) => (
-        <Toast
+      {animatedToasts.map(({item, key, props}) =>
+        item && <Toast
           key={key}
           toast={item}
           style={props}
         />
-      ))}
+      )}
     </div>
   )
 }

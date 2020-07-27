@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useToast, ToastMessage } from '../../../hooks/toast';
 
 import './styles.css';
+import { animated } from 'react-spring';
 
 interface ToastProps {
   toast: ToastMessage;
@@ -14,20 +15,21 @@ const Toast: React.FC<ToastProps> = ({ toast, style }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      console.log('Remove Toast')
       removeToast(toast.id);
     }, 3000);
+    console.log(timer);
 
-    return () => clearTimeout(timer);
+    return () => {
+      console.log('clear timeout')
+      clearTimeout(timer);
+    };
   }, [removeToast, toast.id]);
 
-  useEffect(() => {
-    console.log('entra')
-  }, [])
-
   return (
-    <div className="toasts" style={style}>
+    <animated.div className="toasts" style={style}>
       <span>{toast.message}</span>
-    </div>
+    </animated.div>
   )
 }
 
