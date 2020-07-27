@@ -10,6 +10,7 @@ import logo from '../../assets/logo.svg';
 
 import './styles.css';
 import { LeafletMouseEvent } from 'leaflet';
+import { useToast } from '../../hooks/toast';
 
 interface ItemData {
   id: number;
@@ -47,6 +48,8 @@ const CreatePoint = () => {
     email: '',
     whatsapp: ''
   })
+
+  const { addToast } = useToast();
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(position => {
@@ -143,11 +146,23 @@ const CreatePoint = () => {
       items
     }
 
-    const response = await api.post<PointData>('points', data);
+    await api.post<PointData>('points', data);
 
-    console.log(response.data.name);
+    addToast({
+      message: 'Ponto de coleta adicionado com sucesso!'
+    })
 
-  }, [formData, selectedCity, selectedItems, selectedPosition, selectedUf])
+    setFormData({
+      name: '',
+      email: '',
+      whatsapp: ''
+    });
+    setSelectedUf('');
+    setSelectedCity('');
+    setSelectedPosition([0, 0]);
+    setSelectedItems([]);
+
+  }, [addToast, formData, selectedCity, selectedItems, selectedPosition, selectedUf])
 
   return (
     <div id="page-create-point">
@@ -174,6 +189,7 @@ const CreatePoint = () => {
               type="text"
               name="name"
               id="name"
+              value={formData.name}
               onChange={handleChangeData}
             />
           </div>
@@ -185,6 +201,7 @@ const CreatePoint = () => {
                 type="email"
                 name="email"
                 id="email"
+                value={formData.email}
                 onChange={handleChangeData}
               />
             </div>
@@ -194,6 +211,7 @@ const CreatePoint = () => {
                 type="text"
                 name="whatsapp"
                 id="whatsapp"
+                value={formData.whatsapp}
                 onChange={handleChangeData}
               />
             </div>
